@@ -49,11 +49,11 @@ module instructionCache #(
 
 	always_ff @(checkMiss) begin
 		// After this, it seems to be delayed by a cycle
-		if (cacheLine[0] == 1 && tag == cacheLine[1+:TAGSIZE]) begin
+		if (cacheLine[CACHELINESIZE_PRESENT-1] == 1 && tag == cacheLine[CACHELINESIZE_PRESENT-2-:TAGSIZE]) begin
 			/*
 				Valid cache entry, proceed
 			*/
-			dataOut <= cacheLine[CACHELINESIZE_PRESENT-1:1+TAGSIZE];
+			dataOut <= cacheLine[CACHELINESIZE-1:0];
 			missed <= 0;
 			$display("%x => %x => %x", address, cacheIndex, cacheLine);
 		end else begin
