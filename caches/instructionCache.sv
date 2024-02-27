@@ -16,8 +16,7 @@ module instructionCache #(
 	input clk
 );
 	initial begin
-		cache[0] = {32'h00112233, 32'h44556677, 45'h00000000000, 1'b1};
-		cache[1] = {32'h8899AABB, 32'hCCDDEEFF, 45'h00000000000, 1'b1};
+		$readmemh("initCache.txt", cache);
 	end
 
 	reg [CACHELINESIZE_PRESENT-1:0] cache [NCACHE_ENTRIES-1:0];
