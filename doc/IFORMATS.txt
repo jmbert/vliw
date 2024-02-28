@@ -5,18 +5,28 @@ Positions:
 	RS1	[15:11]
 	RS2	[20:16]
 	
-	IMM16	[26:11]
+	IMM20	[30:11]
+	IMM12	[27:16]
+
+	F1 	[31]
 
 	F11	[31:21]
-	F5/ARS1	[31:27]
+	F5	[31:27]
 
+	F4	[31:28]
 	F26	[31:6]
 	
-Format I16:
+Format I12:
 	Opcode
 	RD
-	IMM16
-	F5
+	RS1
+	IMM12
+	F4
+
+Format I20:
+	Opcode
+	RD
+	IMM20
 
 Format R:
 	Opcode

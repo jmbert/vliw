@@ -2,7 +2,9 @@
 `include "alu/alu.sv"
 
 module functionalUnit #(
+/* verilator lint_off UNUSEDPARAM */
 	FUID
+/* verilator lint_on UNUSEDPARAM */
 ) (
 
 	input logic clk,
@@ -34,7 +36,9 @@ module functionalUnit #(
 		Instruction pins
 	*/
 	input logic [31:0] instruction,
+/* verilator lint_off UNUSEDSIGNAL */
 	input logic [63:0] bundleAddr,
+/* verilator lint_on UNUSEDSIGNAL */
 	input logic instructionReady
 );
 
@@ -55,10 +59,12 @@ module functionalUnit #(
 
 	`define OPCODE workingInstruction[5:0]
 	`define RD workingInstruction[10:6]
-	`define IMM16 workingInstruction[26:11]
+	`define RS1 workingInstruction[15:11]
+	`define IMM12 workingInstruction[27:16]
+	`define IMM20 workingInstruction[30:11]
 	`define F26 workingInstruction[31:6]
-	`define F5 workingInstruction[31:27]
-	`define ARS1 workingInstruction[31:27]
+	`define F4 workingInstruction[31:28]
+	`define F1 workingInstruction[31]
 
 	logic [3:0] stage;
 	`define FETCH 0
@@ -96,11 +102,10 @@ module functionalUnit #(
 			if (stage == `DECODE) begin
 				registerEnable <= 0;
 				registerWriteEnable <= 0;
-				$strobe("FU: %x: Instruction: %x at %x", FUID, instruction, bundleAddr);
 
 				case (`OPCODE)
-					`OPADDUI, `OPXORUI, `OPORUI, `OPANDUI: begin
-						registerAddress1 <= `ARS1;
+					`OPI_ART: begin
+						registerAddress1 <= `RS1;
 						registerEnable <= 1;
 					end
 					`SINGLE: begin
@@ -115,53 +120,51 @@ module functionalUnit #(
 				stage <= `EXECUTE;
 			end else if (stage == `EXECUTE) begin
 				case (`OPCODE)
-					`OPADDUI: begin
-						aluInput1 <= registerOutputData1;
-						aluInput2 <= {48'b0, `IMM16};
-						aluOperation <= `ADD;
-					end 
-					`OPXORUI: begin
-						aluInput1 <= registerOutputData1;
-						aluInput2 <= {48'b0, `IMM16};
-						aluOperation <= `XOR;
-					end 
-					`OPANDUI: begin
-						aluInput1 <= registerOutputData1;
-						aluInput2 <= {48'b0, `IMM16};
-						aluOperation <= `AND;
-					end 
-					`OPORUI: begin
-						aluInput1 <= registerOutputData1;
-						aluInput2 <= {48'b0, `IMM16};
-						aluOperation <= `OR;
-					end 
+					`OPI_ART: begin
+						case (`F4)
+							`ADDUI: begin
+								aluInput1 <= registerOutputData1;
+								aluInput2 <= {52'b0, `IMM12};
+								aluOperation <= `ADD;
+							end 
+							`XORUI: begin
+								aluInput1 <= registerOutputData1;
+								aluInput2 <= {52'b0, `IMM12};
+								aluOperation <= `XOR;
+							end 
+							`ANDUI: begin
+								aluInput1 <= registerOutputData1;
+								aluInput2 <= {52'b0, `IMM12};
+								aluOperation <= `AND;
+							end 
+							`ORUI: begin
+								aluInput1 <= registerOutputData1;
+								aluInput2 <= {52'b0, `IMM12};
+								aluOperation <= `OR;
+							end 
+							default: begin end
+						endcase
+					end
 					default: begin end
 				endcase
 				stage <= `WRITEBACK;				
 			end else if (stage == `WRITEBACK) begin
 				case (`OPCODE)
-					`OPADDUI, `OPXORUI, `OPORUI, `OPANDUI: begin
+					`OPI_ART: begin
 						registerWriteAddress <= `RD;
 						registerWriteEnable <= 1;
 						registerEnable <= 1;
 						registerInputData <= aluOutput;
 					end 
-					`OPI_16: begin
-						case (`F5)
-							`LUUI: begin
-								registerWriteAddress <= `RD;
-								registerInputData <= {32'b0, `IMM16, 16'b0};
-								registerWriteEnable <= 1;
-								registerEnable <= 1;
-							end 
-							`LSUI: begin
-								registerWriteAddress <= `RD;
-								registerInputData <= {{32{`IMM16[15]}}, `IMM16, 16'b0};
-								registerWriteEnable <= 1;
-								registerEnable <= 1;
-							end
-							default: begin end
-						endcase
+					`LUI: begin
+						registerWriteAddress <= `RD;
+						if (`F1 == 0) begin
+							registerInputData <= {32'b0, `IMM20, 12'b0};	
+						end else begin
+							registerInputData <= {{32{`IMM20[19]}}, `IMM20, 12'b0};	
+						end
+						registerWriteEnable <= 1;
+						registerEnable <= 1;
 					end
 					default: begin end
 				endcase
