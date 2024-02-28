@@ -9,7 +9,9 @@ module instructionCache #(
 	localparam TAGSIZE = PHYSICAL_ADDRESS_LENGTH - CACHEINDEX - CACHELINEINDEX,
 	localparam CACHELINESIZE_PRESENT = CACHELINESIZE + 1 + TAGSIZE // Plus valid bit and tagsize
 ) (
+/* verilator lint_off UNUSEDSIGNAL */
 	input logic [PHYSICAL_ADDRESS_LENGTH-1:0] address,
+/* verilator lint_on UNUSEDSIGNAL */
 	output logic [CACHELINESIZE-1:0] data,
 	input logic doFetch,
 	output logic doneFetch,
@@ -22,7 +24,6 @@ module instructionCache #(
 
 	logic [CACHELINESIZE_PRESENT-1:0] cache [NCACHE_ENTRIES-1:0];
 
-	logic [CACHELINEINDEX-1:0] instrOffset; // Only used to detect misalignment
 	logic [CACHEINDEX-1:0] cacheIndex;
 	logic [TAGSIZE-1:0] tag;
 	
@@ -32,10 +33,8 @@ module instructionCache #(
 		Address: TAG CACHEINDEX ZERO(n bits)
 	*/
 	logic checkMiss;
-	logic missed;
 
 	always_comb begin
-		instrOffset = address[CACHELINEINDEX-1:0];
 		cacheIndex = address[CACHELINEINDEX+CACHEINDEX-1:CACHELINEINDEX];
 		tag = address[TAGSIZE+CACHEINDEX+CACHELINEINDEX-1:CACHEINDEX+CACHELINEINDEX];
 	end
@@ -49,13 +48,11 @@ module instructionCache #(
 					Valid cache entry, proceed
 				*/
 				data <= cacheLine[CACHELINESIZE-1:0];
-				missed <= 0;
 			end else begin
 				/*
 					TODO - Handle cache miss
 				*/
 				data <= 0;
-				missed <= 1;
 			end
 			doneFetch <= 1;
 			checkMiss <= 0;	

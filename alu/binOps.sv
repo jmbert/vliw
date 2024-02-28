@@ -7,8 +7,6 @@ module xorMod #(
 	output logic [OPERANDSIZE-1:0] q
 );
 
-	logic [OPERANDSIZE-1:0] carries;
-
 	generate
 		genvar bitI;
 		for (bitI = 0; bitI < OPERANDSIZE ; bitI++ ) begin
@@ -28,8 +26,6 @@ module andMod #(
 	output logic [OPERANDSIZE-1:0] q
 );
 
-	logic [OPERANDSIZE-1:0] carries;
-
 	generate
 		genvar bitI;
 		for (bitI = 0; bitI < OPERANDSIZE ; bitI++ ) begin
@@ -48,8 +44,6 @@ module orMod #(
 	input logic [OPERANDSIZE-1:0] b,
 	output logic [OPERANDSIZE-1:0] q
 );
-
-	logic [OPERANDSIZE-1:0] carries;
 
 	generate
 		genvar bitI;

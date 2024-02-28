@@ -8,8 +8,6 @@ module functionalUnit #(
 	input logic clk,
 	input logic rst,
 
-	input logic do_stall,
-	output logic stalling,
 	output logic working,
 
 	/*
@@ -19,14 +17,15 @@ module functionalUnit #(
 	output logic [63:0] registerInputData,
 	output logic [4:0] registerWriteAddress,
 
-	input logic [63:0] registerOutputData1,
 	output logic [4:0] registerAddress1,
-
-	input logic [63:0] registerOutputData2,
 	output logic [4:0] registerAddress2,
-
-	input logic [63:0] registerOutputData3,
 	output logic [4:0] registerAddress3,
+
+	input logic [63:0] registerOutputData1,
+/* verilator lint_off UNUSEDSIGNAL */
+	input logic [63:0] registerOutputData2,
+	input logic [63:0] registerOutputData3,
+/* verilator lint_on UNUSEDSIGNAL */
 
 	output logic registerWriteEnable,
 	output logic registerEnable,
@@ -49,8 +48,7 @@ module functionalUnit #(
 		.a(aluInput1),
 		.b(aluInput2),
 		.q(aluOutput),
-		.operationSelect(aluOperation),
-		.clk(clk)
+		.operationSelect(aluOperation)
 	);
 
 	logic [31:0] workingInstruction;
@@ -84,6 +82,9 @@ module functionalUnit #(
 			registerInputData <= 0;
 			registerWriteEnable <= 0;
 			registerWriteAddress <= 0;
+			registerAddress1 <= 0;
+			registerAddress2 <= 0;
+			registerAddress3 <= 0;
 			working <= 0;
 			stage <= `FETCH;
 		end
@@ -91,8 +92,7 @@ module functionalUnit #(
 
 
 	always_ff @( posedge clk ) begin
-		stalling <= do_stall;
-		if (!stalling && !rst) begin
+		if (!rst) begin
 			if (stage == `DECODE) begin
 				registerEnable <= 0;
 				registerWriteEnable <= 0;

@@ -42,26 +42,23 @@ module vliw #(
 	*/
 	logic [63:0] pc;
 	logic doInstructionFetch;
-	logic waitingForRead;
 	
 	always_ff @(posedge clk) begin
 		if (rst == 1) begin
 			pc <= 0;
 			doInstructionFetch <= 0; 
-			waitingForRead <= 0;
+			doInstruction <= 1;
 		end else if (fuWorking == 0) begin
 			doInstructionFetch <= 1;
-			waitingForRead <= 1;
 			pc <= pc + INSTRUCTIONSIZEBYTES;
 		end
 	end
 
 	always_ff @(posedge clk) begin
 		if (doneFetch == 1) begin
-			waitingForRead <= 0;
 			instruction <= instructionVolatile;
-			doInstruction <= 1;
 			pcSaved <= pc;
+			doInstruction <= 1;
 		end else begin
 			doInstructionFetch <= 0;
 			doInstruction <= 0;
@@ -85,8 +82,6 @@ module vliw #(
 
 	logic doneFetch;
 
-
-	logic [NFU-1:0] fuStalls;
 	logic [NFU-1:0] fuWorking;
 
 	/*
@@ -116,11 +111,9 @@ module vliw #(
 
 				.clk(clk),
 
-				.do_stall(0),
 				.rst(rst),
 				.instructionReady(doInstruction),
 				
-				.stalling(fuStalls[fuNumber]),
 				.working(fuWorking[fuNumber])
 			);
 		end

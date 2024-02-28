@@ -12,9 +12,7 @@ module alu #(
 	input logic [OPERANDSIZE-1:0] a,
 	input logic [OPERANDSIZE-1:0] b,
 	input logic [11:0] operationSelect,
-	output logic [OPERANDSIZE-1:0] q,
-
-	input logic clk
+	output logic [OPERANDSIZE-1:0] q
 );
 
 	adder #(.OPERANDSIZE(OPERANDSIZE)) adderModule (

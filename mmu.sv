@@ -3,7 +3,9 @@
 module immu #(
 	INSTRUCTIONSIZE
 ) (
+/* verilator lint_off UNUSEDSIGNAL */
 	input logic [63:0] address,
+/* verilator lint_on UNUSEDSIGNAL */
 	output logic [INSTRUCTIONSIZE-1:0] instruction,
 	input logic doFetch,
 	output logic doneFetch,
