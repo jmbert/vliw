@@ -99,7 +99,7 @@ module functionalUnit #(
 				$strobe("FU: %x: Instruction: %x at %x", FUID, instruction, bundleAddr);
 
 				case (`OPCODE)
-					`OPADDUI: begin
+					`OPADDUI, `OPXORUI, `OPORUI, `OPANDUI: begin
 						registerAddress1 <= `ARS1;
 						registerEnable <= 1;
 					end
@@ -120,12 +120,27 @@ module functionalUnit #(
 						aluInput2 <= {48'b0, `IMM16};
 						aluOperation <= `ADD;
 					end 
+					`OPXORUI: begin
+						aluInput1 <= registerOutputData1;
+						aluInput2 <= {48'b0, `IMM16};
+						aluOperation <= `XOR;
+					end 
+					`OPANDUI: begin
+						aluInput1 <= registerOutputData1;
+						aluInput2 <= {48'b0, `IMM16};
+						aluOperation <= `AND;
+					end 
+					`OPORUI: begin
+						aluInput1 <= registerOutputData1;
+						aluInput2 <= {48'b0, `IMM16};
+						aluOperation <= `OR;
+					end 
 					default: begin end
 				endcase
 				stage <= `WRITEBACK;				
 			end else if (stage == `WRITEBACK) begin
 				case (`OPCODE)
-					`OPADDUI: begin
+					`OPADDUI, `OPXORUI, `OPORUI, `OPANDUI: begin
 						registerWriteAddress <= `RD;
 						registerWriteEnable <= 1;
 						registerEnable <= 1;
