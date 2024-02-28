@@ -1,0 +1,30 @@
+Positions:
+	Opcode 	[5:0]
+
+	RD/RS3	[10:6]
+	RS1	[15:11]
+	RS2	[20:16]
+	
+	IMM16	[26:11]
+
+	F11	[31:21]
+	F5/ARS1	[31:27]
+
+	F26	[31:6]
+	
+Format I16:
+	Opcode
+	RD
+	IMM16
+	F5
+
+Format R:
+	Opcode
+	RD
+	RS1
+	RS2
+	F11
+
+Format U:
+	Opcode
+	F26

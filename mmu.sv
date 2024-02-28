@@ -3,14 +3,15 @@
 module immu #(
 	INSTRUCTIONSIZE
 ) (
-	input [63:0] address,
-	output [INSTRUCTIONSIZE-1:0] instruction,
-	input doFetch,
+	input logic [63:0] address,
+	output logic [INSTRUCTIONSIZE-1:0] instruction,
+	input logic doFetch,
+	output logic doneFetch,
 
-	input clk
+	input logic clk
 );
 	
-	reg [INSTRUCTIONSIZE-1:0] instructionBigEndian;
+	logic [INSTRUCTIONSIZE-1:0] instructionBigEndian;
 
 	assign instruction = {<<8{instructionBigEndian}};
 
@@ -18,7 +19,8 @@ module immu #(
 		.address({address[55:0]}),
 		.data(instructionBigEndian),
 		.clk(clk),
-		.doFetch(doFetch)
+		.doFetch(doFetch),
+		.doneFetch(doneFetch)
 	);
 
 endmodule

@@ -1,9 +1,10 @@
-`include "vliw.sv"
+
 `default_nettype none
+`include "vliw.sv"
 
 module tb_vliw;
-reg clk;
-reg rst_n;
+logic clk;
+logic rst_n;
 
 vliw vliw
 (
@@ -31,4 +32,3 @@ initial begin
 end
 
 endmodule
-`default_nettype wire

@@ -9,32 +9,30 @@ module instructionCache #(
 	localparam TAGSIZE = PHYSICAL_ADDRESS_LENGTH - CACHEINDEX - CACHELINEINDEX,
 	localparam CACHELINESIZE_PRESENT = CACHELINESIZE + 1 + TAGSIZE // Plus valid bit and tagsize
 ) (
-	input [PHYSICAL_ADDRESS_LENGTH-1:0] address,
-	output [CACHELINESIZE-1:0] data,
-	input doFetch,
+	input logic [PHYSICAL_ADDRESS_LENGTH-1:0] address,
+	output logic [CACHELINESIZE-1:0] data,
+	input logic doFetch,
+	output logic doneFetch,
 
-	input clk
+	input logic clk
 );
 	initial begin
 		$readmemh("initCache.txt", cache);
 	end
 
-	reg [CACHELINESIZE_PRESENT-1:0] cache [NCACHE_ENTRIES-1:0];
+	logic [CACHELINESIZE_PRESENT-1:0] cache [NCACHE_ENTRIES-1:0];
 
-	reg [CACHELINEINDEX-1:0] instrOffset; // Only used to detect misalignment
-	reg [CACHEINDEX-1:0] cacheIndex;
-	reg [TAGSIZE-1:0] tag;
+	logic [CACHELINEINDEX-1:0] instrOffset; // Only used to detect misalignment
+	logic [CACHEINDEX-1:0] cacheIndex;
+	logic [TAGSIZE-1:0] tag;
 	
-	reg [CACHELINESIZE_PRESENT-1:0] cacheLine;
-
-	reg [CACHELINESIZE-1:0] dataOut;
-	assign data = dataOut;
+	logic [CACHELINESIZE_PRESENT-1:0] cacheLine;
 
 	/*
 		Address: TAG CACHEINDEX ZERO(n bits)
 	*/
-	reg checkMiss;
-	reg missed;
+	logic checkMiss;
+	logic missed;
 
 	always_comb begin
 		instrOffset = address[CACHELINEINDEX-1:0];
@@ -53,16 +51,15 @@ module instructionCache #(
 			/*
 				Valid cache entry, proceed
 			*/
-			dataOut <= cacheLine[CACHELINESIZE-1:0];
+			data <= cacheLine[CACHELINESIZE-1:0];
 			missed <= 0;
-			$display("%x => %x => %x", address, cacheIndex, cacheLine);
 		end else begin
 			/*
 				TODO - Handle cache miss
 			*/
-			dataOut <= 0;
+			data <= 0;
 			missed <= 1;
-			$display("Instruction Cache Miss:\n\tCache line index: %x\n\tCache line: %x\n\tTag: %x\n\tFull Address: %x", cacheIndex, cacheLine, tag, address);
 		end
+		doneFetch <= ~doneFetch;
 	end
 endmodule
