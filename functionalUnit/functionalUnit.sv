@@ -68,17 +68,13 @@ module functionalUnit #(
 	`define EXECUTE 2
 	`define WRITEBACK 3
 
-	always_ff @(posedge clk ) begin
-		if (stage == `FETCH) begin
-			working <= 0;
-		end else begin
-			working <= 1;
-		end
-	end
 	always_ff @(posedge clk) begin
 		if (instructionReady == 1 && stage == `FETCH) begin
 			workingInstruction <= instruction;
+			working <= 1;
 			stage <= `DECODE;
+		end else if (stage == `WRITEBACK) begin
+			working <= 0;
 		end
 	end
 
@@ -88,6 +84,7 @@ module functionalUnit #(
 			registerInputData <= 0;
 			registerWriteEnable <= 0;
 			registerWriteAddress <= 0;
+			working <= 0;
 			stage <= `FETCH;
 		end
 	end

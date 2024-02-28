@@ -42,13 +42,6 @@ module instructionCache #(
 
 	always_ff @(posedge clk) begin
 		doneFetch <= 0;
-		if (doFetch) begin
-			cacheLine <= cache[cacheIndex];
-			checkMiss <= 1;
-		end
-	end
-
-	always_ff @(posedge clk) begin
 		if (checkMiss) begin
 			// After this, it seems to be delayed by a cycle
 			if (cacheLine[CACHELINESIZE_PRESENT-1] == 1 && tag == cacheLine[CACHELINESIZE_PRESENT-2-:TAGSIZE]) begin
@@ -66,6 +59,9 @@ module instructionCache #(
 			end
 			doneFetch <= 1;
 			checkMiss <= 0;	
+		end else if (doFetch) begin
+			cacheLine <= cache[cacheIndex];
+			checkMiss <= 1;
 		end
 	end
 endmodule

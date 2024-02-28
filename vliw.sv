@@ -59,11 +59,11 @@ module vliw #(
 	always_ff @(posedge clk) begin
 		if (doneFetch == 1) begin
 			waitingForRead <= 0;
-			doInstructionFetch <= 0;
 			instruction <= instructionVolatile;
 			doInstruction <= 1;
 			pcSaved <= pc;
 		end else begin
+			doInstructionFetch <= 0;
 			doInstruction <= 0;
 		end
 	end
