@@ -1,4 +1,5 @@
 `include "functionalUnit/listingDefs.sv"
+`include "alu/alu.sv"
 
 module functionalUnit #(
 	FUID
@@ -38,6 +39,20 @@ module functionalUnit #(
 	input logic instructionReady
 );
 
+	logic [63:0] aluInput1;
+	logic [63:0] aluInput2;
+	logic [63:0] aluOutput;
+
+	logic [11:0] aluOperation;
+
+	alu fuAlu (
+		.a(aluInput1),
+		.b(aluInput2),
+		.q(aluOutput),
+		.operationSelect(aluOperation),
+		.clk(clk)
+	);
+
 	logic [31:0] workingInstruction;
 
 	`define OPCODE workingInstruction[5:0]
@@ -45,17 +60,13 @@ module functionalUnit #(
 	`define IMM16 workingInstruction[26:11]
 	`define F26 workingInstruction[31:6]
 	`define F5 workingInstruction[31:27]
+	`define ARS1 workingInstruction[31:27]
+
+	logic [3:0] stage;
 	`define FETCH 0
 	`define DECODE 1
 	`define EXECUTE 2
-
-	logic [5:0] opcode;
-
-	logic [15:0] imm16;
-	logic [4:0] rd;
-	logic [4:0] f5;
-
-	logic [25:0] f26;
+	`define WRITEBACK 3
 
 	always_ff @(posedge clk ) begin
 		if (stage == `FETCH) begin
@@ -65,7 +76,7 @@ module functionalUnit #(
 		end
 	end
 	always_ff @(posedge clk) begin
-		if (instructionReady == 1) begin
+		if (instructionReady == 1 && stage == `FETCH) begin
 			workingInstruction <= instruction;
 			stage <= `DECODE;
 		end
@@ -81,42 +92,22 @@ module functionalUnit #(
 		end
 	end
 
-	always_comb begin
-		opcode = `OPCODE;
-		imm16 = `IMM16;
-		rd = `RD;
-		f5 = `F5;
-		f26 = `F26;
-	end
-
-	logic [3:0] stage;
 
 	always_ff @( posedge clk ) begin
 		stalling <= do_stall;
 		if (!stalling && !rst) begin
 			if (stage == `DECODE) begin
+				registerEnable <= 0;
+				registerWriteEnable <= 0;
 				$strobe("FU: %x: Instruction: %x at %x", FUID, instruction, bundleAddr);
 
-				case (opcode)
-					`OPI_16: begin
-						case (f5)
-							`LUUI: begin
-								registerWriteAddress <= rd;
-								registerInputData <= {32'b0, imm16, 16'b0};
-								registerWriteEnable <= 1;
-								registerEnable <= 1;
-							end 
-							`LSUI: begin
-								registerWriteAddress <= rd;
-								registerInputData <= {{32{imm16[15]}}, imm16, 16'b0};
-								registerWriteEnable <= 1;
-								registerEnable <= 1;
-							end
-							default: begin end
-						endcase
+				case (`OPCODE)
+					`OPADDUI: begin
+						registerAddress1 <= `ARS1;
+						registerEnable <= 1;
 					end
 					`SINGLE: begin
-						case (f26)
+						case (`F26)
 							`NOP: begin
 							end
 							default: begin end
@@ -126,7 +117,43 @@ module functionalUnit #(
 				endcase
 				stage <= `EXECUTE;
 			end else if (stage == `EXECUTE) begin
-				stage <= `FETCH;				
+				case (`OPCODE)
+					`OPADDUI: begin
+						aluInput1 <= registerOutputData1;
+						aluInput2 <= {48'b0, `IMM16};
+						aluOperation <= `ADD;
+					end 
+					default: begin end
+				endcase
+				stage <= `WRITEBACK;				
+			end else if (stage == `WRITEBACK) begin
+				case (`OPCODE)
+					`OPADDUI: begin
+						registerWriteAddress <= `RD;
+						registerWriteEnable <= 1;
+						registerEnable <= 1;
+						registerInputData <= aluOutput;
+					end 
+					`OPI_16: begin
+						case (`F5)
+							`LUUI: begin
+								registerWriteAddress <= `RD;
+								registerInputData <= {32'b0, `IMM16, 16'b0};
+								registerWriteEnable <= 1;
+								registerEnable <= 1;
+							end 
+							`LSUI: begin
+								registerWriteAddress <= `RD;
+								registerInputData <= {{32{`IMM16[15]}}, `IMM16, 16'b0};
+								registerWriteEnable <= 1;
+								registerEnable <= 1;
+							end
+							default: begin end
+						endcase
+					end
+					default: begin end
+				endcase
+				stage <= `FETCH;
 			end
 		end
 	end

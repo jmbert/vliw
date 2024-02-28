@@ -24,7 +24,7 @@ initial begin
 	#1 rst_n=1'bx;clk=1'bx;
 	#(CLK_PERIOD*3) rst_n=1;
 	#(CLK_PERIOD*3) rst_n=0;clk=0;
-	repeat(5) @(posedge clk);
+	repeat(50) @(posedge clk);
 	rst_n=1;
 	@(posedge clk);
 	repeat(2) @(posedge clk);

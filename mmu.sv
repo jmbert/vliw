@@ -11,7 +11,7 @@ module immu #(
 	input logic clk
 );
 	
-	logic [INSTRUCTIONSIZE-1:0] instructionBigEndian;
+	reg [INSTRUCTIONSIZE-1:0] instructionBigEndian;
 
 	assign instruction = {<<8{instructionBigEndian}};
 

@@ -42,22 +42,42 @@ module vliw #(
 	*/
 	logic [63:0] pc;
 	logic doInstructionFetch;
+	logic waitingForRead;
+	
 	always_ff @(posedge clk) begin
-		if (rst == 0 && fuStalls == 0 && fuWorking == 0) begin
-			pc <= pc + INSTRUCTIONSIZEBYTES;
-			doInstructionFetch <= 1;
-		end else begin 
+		if (rst == 1) begin
 			pc <= 0;
-			doInstructionFetch <= 0;
+			doInstructionFetch <= 0; 
+			waitingForRead <= 0;
+		end else if (fuWorking == 0) begin
+			doInstructionFetch <= 1;
+			waitingForRead <= 1;
+			pc <= pc + INSTRUCTIONSIZEBYTES;
 		end
 	end
+
+	always_ff @(posedge clk) begin
+		if (doneFetch == 1) begin
+			waitingForRead <= 0;
+			doInstructionFetch <= 0;
+			instruction <= instructionVolatile;
+			doInstruction <= 1;
+			pcSaved <= pc;
+		end else begin
+			doInstruction <= 0;
+		end
+	end
+
+	logic [INSTRUCTIONSIZE-1:0] instructionVolatile;
 	logic [INSTRUCTIONSIZE-1:0] instruction;
+	logic [INSTRUCTIONSIZE-1:0] pcSaved;
+	logic doInstruction;
 
 	immu #(
 		.INSTRUCTIONSIZE(INSTRUCTIONSIZE)
 	) immu1  (
 		.address(pc),
-		.instruction(instruction),
+		.instruction(instructionVolatile),
 		.clk(clk),
 		.doFetch(doInstructionFetch),
 		.doneFetch(doneFetch)
@@ -92,13 +112,13 @@ module vliw #(
 				.registerEnable(registerEnable[fuNumber]),
 
 				.instruction(instruction[32*fuNumber+:32]),
-				.bundleAddr(pc),
+				.bundleAddr(pcSaved),
 
 				.clk(clk),
 
 				.do_stall(0),
 				.rst(rst),
-				.instructionReady(doneFetch),
+				.instructionReady(doInstruction),
 				
 				.stalling(fuStalls[fuNumber]),
 				.working(fuWorking[fuNumber])
