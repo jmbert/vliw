@@ -4,11 +4,17 @@
 
 module vliw #(
 	NFU = 2,
+	PHYSICAL_ADDRESS_SIZE=56,
 	localparam INSTRUCTIONSIZEBYTES = NFU * 4,
 	localparam INSTRUCTIONSIZE = INSTRUCTIONSIZEBYTES * 8
 ) (
 	input logic clk,
-	input logic rst
+	input logic rst,
+
+	output logic [PHYSICAL_ADDRESS_SIZE-1:0] addressBus,
+	input logic [63:0] dataIn,
+	output logic [63:0] dataOut,
+	output logic enableWrite
 );
 	logic [4:0] registerWriteAddress[NFU-1:0];
 	logic [63:0] registerInputData [NFU-1:0];
@@ -42,42 +48,51 @@ module vliw #(
 	*/
 	logic [63:0] pc;
 	logic doInstructionFetch;
+	logic fetching;
+	logic executing;
 	
 	always_ff @(posedge clk) begin
+		doInstruction <= 0;
+		doInstructionFetch <= 0;
 		if (rst == 1) begin
 			pc <= 0;
-			doInstructionFetch <= 0; 
-			doInstruction <= 1;
-		end else if (fuWorking == 0) begin
+			instruction <= 0;
+			fetching <= 0;
+			executing <= 0;
+		end else if (executing == 0 && fetching == 0) begin
 			doInstructionFetch <= 1;
+			fetching <= 1;
 			pc <= pc + INSTRUCTIONSIZEBYTES;
+		end else if (doneFetch == 1) begin
+			instruction <= instructionVolatile;
+			doInstruction <= 1;
+			executing <= 1;
+			fetching <= 0;
+		end else if (fuWorking == 0) begin
+			executing <= 0;
 		end
 	end
 
 	always_ff @(posedge clk) begin
-		if (doneFetch == 1) begin
-			instruction <= instructionVolatile;
-			pcSaved <= pc;
-			doInstruction <= 1;
-		end else begin
-			doInstructionFetch <= 0;
-			doInstruction <= 0;
-		end
 	end
 
 	logic [INSTRUCTIONSIZE-1:0] instructionVolatile;
 	logic [INSTRUCTIONSIZE-1:0] instruction;
-	logic [INSTRUCTIONSIZE-1:0] pcSaved;
 	logic doInstruction;
 
-	immu #(
-		.INSTRUCTIONSIZE(INSTRUCTIONSIZE)
-	) immu1  (
-		.address(pc),
+	mmu #(
+		.NFU(NFU)
+	) mmu  (
+		.instructionAddress(pc),
 		.instruction(instructionVolatile),
 		.clk(clk),
-		.doFetch(doInstructionFetch),
-		.doneFetch(doneFetch)
+		.doInstructionFetch(doInstructionFetch),
+		.doneInstructionFetch(doneFetch),
+
+		.doBusWrite(enableWrite),
+		.addrBus(addressBus),
+		.dataOut(dataOut),
+		.dataIn(dataIn)
 	);
 
 	logic doneFetch;
@@ -107,7 +122,7 @@ module vliw #(
 				.registerEnable(registerEnable[fuNumber]),
 
 				.instruction(instruction[32*fuNumber+:32]),
-				.bundleAddr(pcSaved),
+				.bundleAddr(pc),
 
 				.clk(clk),
 

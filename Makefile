@@ -5,7 +5,7 @@ CXX=gcc
 
 VERILATOR?=verilator
 NPROC=$(shell nproc)
-VFLAGS= -Wall -Wno-DECLFILENAME --compiler $(CXX) --trace --assert --top $(TOPMOD) -j $(NPROC)
+VFLAGS= -Wall -Wno-fatal -Wno-DECLFILENAME --compiler $(CXX) --trace --assert --top $(TOPMOD) -j $(NPROC)
 
 
 binary:

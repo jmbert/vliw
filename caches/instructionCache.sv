@@ -16,49 +16,47 @@ module instructionCache #(
 	input logic doFetch,
 	output logic doneFetch,
 
+
+	/* L2 Cache controller */
+	output logic doL2Fetch,
+	input logic doneL2Fetch,
+	output logic [PHYSICAL_ADDRESS_LENGTH-1:0] l2Address,
+	input logic [CACHELINESIZE-1:0] l2Data,
+
 	input logic clk
 );
-	initial begin
-		$readmemh("initCache.txt", cache);
-	end
 
+	`define ADDRESS_CACHETAG address[CACHEINDEX+CACHELINEINDEX+:TAGSIZE]
+	`define ADDRESS_CACHEINDEX address[CACHELINEINDEX+:CACHEINDEX]
+	`define CACHEENTRY cache[`ADDRESS_CACHEINDEX]
 	logic [CACHELINESIZE_PRESENT-1:0] cache [NCACHE_ENTRIES-1:0];
-
-	logic [CACHEINDEX-1:0] cacheIndex;
-	logic [TAGSIZE-1:0] tag;
-	
-	logic [CACHELINESIZE_PRESENT-1:0] cacheLine;
-
-	/*
-		Address: TAG CACHEINDEX ZERO(n bits)
-	*/
-	logic checkMiss;
-
-	always_comb begin
-		cacheIndex = address[CACHELINEINDEX+CACHEINDEX-1:CACHELINEINDEX];
-		tag = address[TAGSIZE+CACHEINDEX+CACHELINEINDEX-1:CACHEINDEX+CACHELINEINDEX];
-	end
+	logic waitingForL2;
 
 	always_ff @(posedge clk) begin
-		doneFetch <= 0;
-		if (checkMiss) begin
-			// After this, it seems to be delayed by a cycle
-			if (cacheLine[CACHELINESIZE_PRESENT-1] == 1 && tag == cacheLine[CACHELINESIZE_PRESENT-2-:TAGSIZE]) begin
-				/*
-					Valid cache entry, proceed
-				*/
-				data <= cacheLine[CACHELINESIZE-1:0];
-			end else begin
-				/*
-					TODO - Handle cache miss
-				*/
-				data <= 0;
-			end
+		if (doneL2Fetch && waitingForL2) begin
+			cache[`ADDRESS_CACHEINDEX] <= {1'b1, `ADDRESS_CACHETAG, l2Data};
+			data <= l2Data;
 			doneFetch <= 1;
-			checkMiss <= 0;	
+			doL2Fetch <= 0;
+			waitingForL2 <= 0;
 		end else if (doFetch) begin
-			cacheLine <= cache[cacheIndex];
-			checkMiss <= 1;
+			if (`CACHEENTRY[CACHELINESIZE_PRESENT-1] == 1 && `ADDRESS_CACHETAG == `CACHEENTRY[CACHELINESIZE_PRESENT-2-:TAGSIZE]) begin
+				data <= `CACHEENTRY[CACHELINESIZE-1:0];
+				doneFetch <= 1;
+				waitingForL2 <= 0;
+			end else begin
+				l2Address <= address;
+				doL2Fetch <= 1;
+				doneFetch <= 0;
+				waitingForL2 <= 1;
+			end
+		end else begin 
+			doL2Fetch <= 0;
+			doneFetch <= 0;
 		end
 	end
 endmodule
+
+`undef ADDRESS_CACHETAG
+`undef ADDRESS_CACHEINDEX
+`undef CACHEENTRY

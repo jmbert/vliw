@@ -1,0 +1,9 @@
+ /* LUI $x1, 0xDEADB, LUI $x2, 0xBEEFD; */
+6F 56 D8 41
+
+5F 77 E8 81
+
+/* ADDUI $x1, $x1, 0xEEF, ADDUI $x2, $x2, 0xEAD */
+0E EF 08 42
+
+0E AD 10 82

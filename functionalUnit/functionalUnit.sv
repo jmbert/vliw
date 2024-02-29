@@ -42,6 +42,10 @@ module functionalUnit #(
 	input logic instructionReady
 );
 
+/* verilator lint_off UNUSEDSIGNAL */
+	logic [63:0] workingBundleAddress;
+/* verilator lint_on UNUSEDSIGNAL */
+
 	logic [63:0] aluInput1;
 	logic [63:0] aluInput2;
 	logic [63:0] aluOutput;
@@ -75,6 +79,7 @@ module functionalUnit #(
 	always_ff @(posedge clk) begin
 		if (instructionReady == 1 && stage == `FETCH) begin
 			workingInstruction <= instruction;
+			workingBundleAddress <= bundleAddr;
 			working <= 1;
 			stage <= `DECODE;
 		end else if (stage == `WRITEBACK) begin
