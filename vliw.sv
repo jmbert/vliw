@@ -46,6 +46,7 @@ module vliw #(
 	/*
 		TODO - Move this into branch module
 	*/
+	logic [63:0] nextPC;
 	logic [63:0] pc;
 	logic doInstructionFetch;
 	logic fetching;
@@ -62,7 +63,7 @@ module vliw #(
 		end else if (executing == 0 && fetching == 0) begin
 			doInstructionFetch <= 1;
 			fetching <= 1;
-			pc <= pc + INSTRUCTIONSIZEBYTES;
+			pc <= nextPC;
 		end else if (doneFetch == 1) begin
 			instruction <= instructionVolatile;
 			doInstruction <= 1;
@@ -72,8 +73,15 @@ module vliw #(
 			executing <= 0;
 		end
 	end
+	logic [63:0] newPCS[NFU-1:0];
+	logic [NFU-1:0] writePCS;
 
-	always_ff @(posedge clk) begin
+	always_ff @(posedge clk ) begin
+		if (writePCS != 0) begin
+			nextPC <= newPCS.or();
+		end else begin
+			nextPC <=  pc + INSTRUCTIONSIZEBYTES;
+		end
 	end
 
 	logic [INSTRUCTIONSIZE-1:0] instructionVolatile;
@@ -128,6 +136,9 @@ module vliw #(
 
 				.rst(rst),
 				.instructionReady(doInstruction),
+
+				.newPC(newPCS[fuNumber]),
+				.writePC(writePCS[fuNumber]),
 				
 				.working(fuWorking[fuNumber])
 			);

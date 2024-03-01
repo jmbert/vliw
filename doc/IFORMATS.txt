@@ -15,7 +15,7 @@ Positions:
 
 	F4	[31:28]
 	F26	[31:6]
-	
+
 Format I12:
 	Opcode
 	RD

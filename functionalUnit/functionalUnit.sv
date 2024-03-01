@@ -32,19 +32,18 @@ module functionalUnit #(
 	output logic registerWriteEnable,
 	output logic registerEnable,
 
+	output logic [63:0] newPC,
+	output logic writePC,
+
 	/*
 		Instruction pins
 	*/
 	input logic [31:0] instruction,
-/* verilator lint_off UNUSEDSIGNAL */
 	input logic [63:0] bundleAddr,
-/* verilator lint_on UNUSEDSIGNAL */
 	input logic instructionReady
 );
 
-/* verilator lint_off UNUSEDSIGNAL */
 	logic [63:0] workingBundleAddress;
-/* verilator lint_on UNUSEDSIGNAL */
 
 	logic [63:0] aluInput1;
 	logic [63:0] aluInput2;
@@ -97,6 +96,7 @@ module functionalUnit #(
 			registerAddress2 <= 0;
 			registerAddress3 <= 0;
 			working <= 0;
+			writePC <= 0;
 			stage <= `FETCH;
 		end
 	end
@@ -107,9 +107,10 @@ module functionalUnit #(
 			if (stage == `DECODE) begin
 				registerEnable <= 0;
 				registerWriteEnable <= 0;
+				writePC <= 0;
 
 				case (`OPCODE)
-					`OPI_ART: begin
+					`OPI_ART, `JALR: begin
 						registerAddress1 <= `RS1;
 						registerEnable <= 1;
 					end
@@ -150,6 +151,21 @@ module functionalUnit #(
 							default: begin end
 						endcase
 					end
+					`JALR: begin
+						case (`F4[3:1])
+							`JALRFN: begin
+								aluInput1 <= registerOutputData1;
+								aluInput2 <= {{48{`F4[3]}}, `F4, `IMM12};
+								aluOperation <= `ADD;
+							end
+							default: begin end
+						endcase
+					end
+					`JAL: begin
+						aluInput1 <= workingBundleAddress;
+						aluInput2 <= {{44{`F1}}, `IMM20};
+						aluOperation <= `ADD;
+					end					
 					default: begin end
 				endcase
 				stage <= `WRITEBACK;				
@@ -163,13 +179,22 @@ module functionalUnit #(
 					end 
 					`LUI: begin
 						registerWriteAddress <= `RD;
-						if (`F1 == 0) begin
+						if (`F1 == `LUUI) begin
 							registerInputData <= {32'b0, `IMM20, 12'b0};	
-						end else begin
+						end else if (`F1 == `LSUI) begin
 							registerInputData <= {{32{`IMM20[19]}}, `IMM20, 12'b0};	
 						end
 						registerWriteEnable <= 1;
 						registerEnable <= 1;
+					end
+					`JALR, `JAL: begin
+						registerWriteAddress <= `RD;
+						registerEnable <= 1;
+						registerWriteEnable <= 1;
+						registerInputData <= workingBundleAddress;
+						
+						newPC <= aluOutput;
+						writePC <= 1;
 					end
 					default: begin end
 				endcase

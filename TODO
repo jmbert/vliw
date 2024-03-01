@@ -1,0 +1,9 @@
+
+- Control Flow instructions
+        - Use this branch module
+        - JALR, BEQ, BGE, BLT, etc...
+
+- Load/Store instructions
+	- Data Cache, writable
+	- L2 Cache writable
+	- Dynamically replace stale I Cache entries on write
