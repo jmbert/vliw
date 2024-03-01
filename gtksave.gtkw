@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.117 (w)1999-2023 BSI
-[*] Fri Mar  1 20:22:09 2024
+[*] Fri Mar  1 21:17:44 2024
 [*]
 [dumpfile] "/home/joe/src/vliw/tb_vliw.vcd"
-[dumpfile_mtime] "Fri Mar  1 20:20:39 2024"
-[dumpfile_size] 395034
+[dumpfile_mtime] "Fri Mar  1 21:15:53 2024"
+[dumpfile_size] 374907
 [savefile] "/home/joe/src/vliw/gtksave.gtkw"
 [timestart] 0
 [size] 1920 1040
 [pos] -1 -1
-*-8.106524 519 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.106524 11 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.tb_vliw.
 [treeopen] TOP.tb_vliw.vliw.
@@ -21,6 +21,7 @@
 [treeopen] TOP.tb_vliw.vliw.genblk1[0].funcUnitN.fuAlu.adderModule.genblk1[62].
 [treeopen] TOP.tb_vliw.vliw.genblk1[0].funcUnitN.fuAlu.adderModule.genblk1[63].
 [treeopen] TOP.tb_vliw.vliw.genblk1[1].
+[treeopen] TOP.tb_vliw.vliw.genblk1[2].
 [treeopen] TOP.tb_vliw.vliw.mmu.
 [sst_width] 211
 [signals_width] 316
@@ -86,6 +87,27 @@ TOP.tb_vliw.vliw.genblk1[1].funcUnitN.fuAlu.q[63:0]
 TOP.tb_vliw.vliw.genblk1[1].funcUnitN.fuAlu.operationSelect[11:0]
 @200
 -
+-FU3
+@28
+TOP.tb_vliw.vliw.genblk1[2].funcUnitN.instructionReady
+@22
+TOP.tb_vliw.vliw.genblk1[2].funcUnitN.stage[3:0]
+TOP.tb_vliw.vliw.genblk1[2].funcUnitN.workingInstruction[31:0]
+TOP.tb_vliw.vliw.genblk1[2].funcUnitN.workingBundleAddress[63:0]
+TOP.tb_vliw.vliw.genblk1[2].funcUnitN.registerAddress1[4:0]
+TOP.tb_vliw.vliw.genblk1[2].funcUnitN.registerOutputData1[63:0]
+TOP.tb_vliw.vliw.genblk1[2].funcUnitN.newPC[63:0]
+@28
+TOP.tb_vliw.vliw.genblk1[2].funcUnitN.writePC
+@200
+-FUALU3
+@22
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.fuAlu.a[63:0]
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.fuAlu.b[63:0]
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.fuAlu.q[63:0]
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.fuAlu.operationSelect[11:0]
+@200
+-
 -MMU
 @22
 TOP.tb_vliw.vliw.mmu.instructionAddress[63:0]
@@ -114,9 +136,10 @@ TOP.tb_vliw.vliw.mmu.l2cache.address[55:0]
 TOP.tb_vliw.vliw.mmu.l2cache.doFetch
 TOP.tb_vliw.vliw.mmu.l2cache.doneFetch
 TOP.tb_vliw.vliw.mmu.l2cache.doMainFetch
+@29
+TOP.tb_vliw.vliw.mmu.l2cache.fillingEntry[1:0]
 @22
 TOP.tb_vliw.vliw.mmu.l2cache.mainData[63:0]
-@23
 TOP.tb_vliw.vliw.mmu.l2cache.data[255:0]
 @200
 -

@@ -36,6 +36,7 @@ module l2cache #(
 	logic [CACHEENTRYWIDTH-1:0] cache [NCACHE_ENTRIES-1:0];
 
 	logic [$clog2(NFU)-2:0] fillingEntry;
+	logic doFill, doFillStart;
 
 	assign doMainWrite = 0;
 	assign mainDataWrite = 0;
@@ -48,10 +49,17 @@ module l2cache #(
 			mainDataWrite <= 0;
 			mainAddress <= 0;
 			cache <= '{default:0};
-		end else if ((doMainFetch && fillingEntry != '1)) begin
-			data[(fillingEntry << 6)+:64] <= mainData;
-			mainAddress <= address + (fillingEntry << 3);
+		end else if (doFillStart) begin
+			mainAddress <= mainAddress + 'b1000;
+			doFill <= 1;
+			doFillStart <= 0;
+		end else if ((doMainFetch && doFill)) begin
+			data[{fillingEntry, 6'b0}+:64] <= mainData;
 			fillingEntry <= fillingEntry + 1;
+			doFill <= 0;
+			if (fillingEntry != '1) begin
+				doFillStart <= 1;
+			end
 		end else if (doMainFetch) begin
 			doneFetch <= 1;
 			doMainFetch <= 0;
@@ -65,6 +73,7 @@ module l2cache #(
 				doMainFetch <= 1;
 				fillingEntry <= 0;
 				doneFetch <= 0;
+				doFillStart <= 1;
 			end
 		end else begin 
 			doMainFetch <= 0;
