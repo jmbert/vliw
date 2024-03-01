@@ -1,0 +1,167 @@
+[*]
+[*] GTKWave Analyzer v3.3.117 (w)1999-2023 BSI
+[*] Fri Mar  1 20:22:09 2024
+[*]
+[dumpfile] "/home/joe/src/vliw/tb_vliw.vcd"
+[dumpfile_mtime] "Fri Mar  1 20:20:39 2024"
+[dumpfile_size] 395034
+[savefile] "/home/joe/src/vliw/gtksave.gtkw"
+[timestart] 0
+[size] 1920 1040
+[pos] -1 -1
+*-8.106524 519 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.tb_vliw.
+[treeopen] TOP.tb_vliw.vliw.
+[treeopen] TOP.tb_vliw.vliw.genblk1[0].
+[treeopen] TOP.tb_vliw.vliw.genblk1[0].funcUnitN.fuAlu.
+[treeopen] TOP.tb_vliw.vliw.genblk1[0].funcUnitN.fuAlu.adderModule.
+[treeopen] TOP.tb_vliw.vliw.genblk1[0].funcUnitN.fuAlu.adderModule.genblk1[0].bitAdderI.
+[treeopen] TOP.tb_vliw.vliw.genblk1[0].funcUnitN.fuAlu.adderModule.genblk1[1].
+[treeopen] TOP.tb_vliw.vliw.genblk1[0].funcUnitN.fuAlu.adderModule.genblk1[62].
+[treeopen] TOP.tb_vliw.vliw.genblk1[0].funcUnitN.fuAlu.adderModule.genblk1[63].
+[treeopen] TOP.tb_vliw.vliw.genblk1[1].
+[treeopen] TOP.tb_vliw.vliw.mmu.
+[sst_width] 211
+[signals_width] 316
+[sst_expanded] 1
+[sst_vpaned_height] 612
+@200
+-GLOBAL
+@28
+TOP.tb_vliw.clk
+TOP.tb_vliw.vliw.rst
+@200
+-VLIW CORE
+@22
+TOP.tb_vliw.vliw.pc[63:0]
+@28
+TOP.tb_vliw.vliw.fetching
+TOP.tb_vliw.vliw.executing
+TOP.tb_vliw.vliw.doInstructionFetch
+TOP.tb_vliw.vliw.doneFetch
+TOP.tb_vliw.vliw.doInstruction
+@200
+-FU1
+@28
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.instructionReady
+@22
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.stage[3:0]
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.workingInstruction[31:0]
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.workingBundleAddress[63:0]
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.registerAddress1[4:0]
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.registerOutputData1[63:0]
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.newPC[63:0]
+@28
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.writePC
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.registerEnable
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.registerWriteEnable
+@200
+-FUALU1
+@22
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.fuAlu.a[63:0]
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.fuAlu.b[63:0]
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.fuAlu.q[63:0]
+TOP.tb_vliw.vliw.genblk1[0].funcUnitN.fuAlu.operationSelect[11:0]
+@200
+-
+-FU2
+@28
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.instructionReady
+@22
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.stage[3:0]
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.workingInstruction[31:0]
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.workingBundleAddress[63:0]
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.registerAddress1[4:0]
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.registerOutputData1[63:0]
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.newPC[63:0]
+@28
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.writePC
+@200
+-FUALU2
+@22
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.fuAlu.a[63:0]
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.fuAlu.b[63:0]
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.fuAlu.q[63:0]
+TOP.tb_vliw.vliw.genblk1[1].funcUnitN.fuAlu.operationSelect[11:0]
+@200
+-
+-MMU
+@22
+TOP.tb_vliw.vliw.mmu.instructionAddress[63:0]
+TOP.tb_vliw.vliw.mmu.translatedInstructionAddress[55:0]
+@28
+TOP.tb_vliw.vliw.mmu.doInstructionFetch
+TOP.tb_vliw.vliw.mmu.finishedInstructionTranslation
+TOP.tb_vliw.vliw.mmu.doneInstructionFetch
+@200
+-INSTRUCTIONCACHE
+@22
+TOP.tb_vliw.vliw.mmu.icache.address[55:0]
+@28
+TOP.tb_vliw.vliw.mmu.icache.doFetch
+TOP.tb_vliw.vliw.mmu.icache.doneFetch
+TOP.tb_vliw.vliw.mmu.icache.doL2Fetch
+TOP.tb_vliw.vliw.mmu.icache.doneL2Fetch
+TOP.tb_vliw.vliw.mmu.icache.waitingForL2
+@22
+TOP.tb_vliw.vliw.mmu.icache.data[255:0]
+@200
+-L2CACHE
+@22
+TOP.tb_vliw.vliw.mmu.l2cache.address[55:0]
+@28
+TOP.tb_vliw.vliw.mmu.l2cache.doFetch
+TOP.tb_vliw.vliw.mmu.l2cache.doneFetch
+TOP.tb_vliw.vliw.mmu.l2cache.doMainFetch
+@22
+TOP.tb_vliw.vliw.mmu.l2cache.mainData[63:0]
+@23
+TOP.tb_vliw.vliw.mmu.l2cache.data[255:0]
+@200
+-
+-REGISTERS
+@22
+TOP.tb_vliw.vliw.registers.bank[1][63:0]
+TOP.tb_vliw.vliw.registers.bank[2][63:0]
+TOP.tb_vliw.vliw.registers.bank[3][63:0]
+TOP.tb_vliw.vliw.registers.bank[4][63:0]
+TOP.tb_vliw.vliw.registers.bank[5][63:0]
+TOP.tb_vliw.vliw.registers.bank[6][63:0]
+TOP.tb_vliw.vliw.registers.bank[7][63:0]
+TOP.tb_vliw.vliw.registers.bank[8][63:0]
+TOP.tb_vliw.vliw.registers.bank[9][63:0]
+TOP.tb_vliw.vliw.registers.bank[10][63:0]
+TOP.tb_vliw.vliw.registers.bank[11][63:0]
+TOP.tb_vliw.vliw.registers.bank[12][63:0]
+TOP.tb_vliw.vliw.registers.bank[13][63:0]
+TOP.tb_vliw.vliw.registers.bank[14][63:0]
+TOP.tb_vliw.vliw.registers.bank[15][63:0]
+TOP.tb_vliw.vliw.registers.bank[16][63:0]
+TOP.tb_vliw.vliw.registers.bank[17][63:0]
+TOP.tb_vliw.vliw.registers.bank[18][63:0]
+TOP.tb_vliw.vliw.registers.bank[19][63:0]
+TOP.tb_vliw.vliw.registers.bank[20][63:0]
+TOP.tb_vliw.vliw.registers.bank[21][63:0]
+TOP.tb_vliw.vliw.registers.bank[22][63:0]
+TOP.tb_vliw.vliw.registers.bank[23][63:0]
+TOP.tb_vliw.vliw.registers.bank[24][63:0]
+TOP.tb_vliw.vliw.registers.bank[25][63:0]
+TOP.tb_vliw.vliw.registers.bank[26][63:0]
+TOP.tb_vliw.vliw.registers.bank[27][63:0]
+TOP.tb_vliw.vliw.registers.bank[28][63:0]
+TOP.tb_vliw.vliw.registers.bank[29][63:0]
+TOP.tb_vliw.vliw.registers.bank[30][63:0]
+TOP.tb_vliw.vliw.registers.bank[31][63:0]
+@200
+-
+-
+-RAM
+@22
+TOP.tb_vliw.ram.address[55:0]
+TOP.tb_vliw.ram.dataIn[63:0]
+TOP.tb_vliw.ram.dataOut[63:0]
+@28
+TOP.tb_vliw.ram.we
+[pattern_trace] 1
+[pattern_trace] 0

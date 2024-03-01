@@ -40,11 +40,13 @@ initial begin
 	$dumpvars(0, tb_vliw);
 end
 
+localparam TEST_CYCLES = 100;
+
 initial begin
 	#1 rst_n=1'bx;clk=1'bx;
 	#(CLK_PERIOD*3) rst_n=1;
 	#(CLK_PERIOD*3) rst_n=0;clk=0;
-	repeat(50) @(posedge clk);
+	repeat(TEST_CYCLES) @(posedge clk);
 	rst_n=1;
 	@(posedge clk);
 	repeat(2) @(posedge clk);

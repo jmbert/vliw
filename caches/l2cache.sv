@@ -20,6 +20,7 @@ module l2cache #(
 	output logic [CACHELINEWIDTH-1:0] data,
 
 	input logic clk,
+	input logic reset,
 
 	output logic doMainFetch,
 	output logic doMainWrite,
@@ -34,28 +35,36 @@ module l2cache #(
 
 	logic [CACHEENTRYWIDTH-1:0] cache [NCACHE_ENTRIES-1:0];
 
-	logic waitingForMain;
+	logic [$clog2(NFU)-2:0] fillingEntry;
 
 	assign doMainWrite = 0;
 	assign mainDataWrite = 0;
 
 	always_ff @( posedge clk ) begin
-		if (waitingForMain) begin
-			cache[`ADDRESS_CACHEINDEX] <= {2'b10, `ADDRESS_CACHETAG, mainData};
-			data <= mainData;
+		if (reset) begin
+			fillingEntry <= 0;
+			data <= 0;
+			doMainFetch <= 0;
+			mainDataWrite <= 0;
+			mainAddress <= 0;
+			cache <= '{default:0};
+		end else if ((doMainFetch && fillingEntry != '1)) begin
+			data[(fillingEntry << 6)+:64] <= mainData;
+			mainAddress <= address + (fillingEntry << 3);
+			fillingEntry <= fillingEntry + 1;
+		end else if (doMainFetch) begin
 			doneFetch <= 1;
 			doMainFetch <= 0;
-			waitingForMain <= 0;
 		end else if (doFetch) begin
 			if (`CACHEENTRY[CACHEENTRYWIDTH-1] == 1 && `ADDRESS_CACHETAG == `CACHEENTRY[CACHEENTRYWIDTH-2-:TAGSIZE]) begin
 				data <= `CACHEENTRY[CACHELINEWIDTH-1:0];
 				doneFetch <= 1;
-				waitingForMain <= 0;
 			end else begin
+				data <= 0;
 				mainAddress <= address;
 				doMainFetch <= 1;
+				fillingEntry <= 0;
 				doneFetch <= 0;
-				waitingForMain <= 1;
 			end
 		end else begin 
 			doMainFetch <= 0;

@@ -23,7 +23,8 @@ module mmu #(
 	output wire [63:0] dataOut,
 	output logic [PHYSICAL_ADDRESS_SIZE-1:0] addrBus,
 
-	input logic clk
+	input logic clk,
+	input logic reset
 );
 
 /* verilator lint_off UNUSEDSIGNAL */
@@ -50,6 +51,7 @@ module mmu #(
 		.l2Address(l2Address),
 		.doL2Fetch(l2DoFetch),
 
+		.reset(reset),
 		.clk(clk)
 	);
 
@@ -72,6 +74,7 @@ module mmu #(
 		.mainData(dataIn),
 		.mainDataWrite(dataOut),
 
+		.reset(reset),
 		.clk(clk)
 	);
 
@@ -80,13 +83,16 @@ module mmu #(
 	logic finishedInstructionTranslation;
 
 	always_ff @( posedge clk ) begin
-		if (doInstructionFetch) begin
-			// TODO - Actual translation here
-			translatedInstructionAddress <= instructionAddress[55:0];
-			finishedInstructionTranslation <= 1;
-		end 
-		if (finishedInstructionTranslation) begin
-			finishedInstructionTranslation <= 0;
+		if (reset) begin
+		end else begin
+			if (doInstructionFetch) begin
+				// TODO - Actual translation here
+				translatedInstructionAddress <= instructionAddress[55:0];
+				finishedInstructionTranslation <= 1;
+			end 
+			if (finishedInstructionTranslation) begin
+				finishedInstructionTranslation <= 0;
+			end
 		end
 	end
 	

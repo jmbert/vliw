@@ -3,7 +3,7 @@
 `include "mmu.sv"
 
 module vliw #(
-	NFU = 2,
+	NFU = 8,
 	PHYSICAL_ADDRESS_SIZE=56,
 	localparam INSTRUCTIONSIZEBYTES = NFU * 4,
 	localparam INSTRUCTIONSIZE = INSTRUCTIONSIZEBYTES * 8
@@ -27,7 +27,9 @@ module vliw #(
 	logic registerWriteEnable [NFU-1:0];
 	logic registerEnable [NFU-1:0];
 
-	registerFile #(.NFU(NFU)) registers (
+	registerFile #(
+		.NFU(NFU)
+	) registers (
 		.writeAddress(registerWriteAddress),
 		.inputData(registerInputData),
 
@@ -89,6 +91,7 @@ module vliw #(
 		.instructionAddress(pc),
 		.instruction(instructionVolatile),
 		.clk(clk),
+		.reset(rst),
 		.doInstructionFetch(doInstructionFetch),
 		.doneInstructionFetch(doneFetch),
 
